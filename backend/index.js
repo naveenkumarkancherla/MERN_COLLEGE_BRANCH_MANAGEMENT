@@ -2,19 +2,16 @@ const connectToMongo = require("./Database/db");
 const express = require("express");
 const app = express();
 connectToMongo();
-const port = 5000 || process.env.PORT;
+const port = process.env.PORT || 5000;
 var cors = require("cors");
 
-app.use(cors());
-app.use(express.json()); //to convert request data to json
+app.use(cors({
+  origin: ["https://mern-college-branch-management-frontend.vercel.app"],
+  methods: ["POST", "GET"],
+  credentials: true
+}));
 
-app.use(cors(
-  {
-    origin : ["https://mern-college-branch-management-frontend.vercel.app"],
-    method : ["POST","GET"],
-    credentials : true
-  }
-));
+app.use(express.json()); //to convert request data to JSON
 
 // Import API routes
 const studentRoutes = require('./routes/student');
