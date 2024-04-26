@@ -8,6 +8,14 @@ var cors = require("cors");
 app.use(cors());
 app.use(express.json()); //to convert request data to json
 
+app.use(cors(
+  {
+    origin : ["https://deploy-MERN-College-Management.vercel.app"],
+    method : ["POST","GET"],
+    credentials : true
+  }
+));
+
 // Import API routes
 const studentRoutes = require('./routes/student');
 // Use the API routes
