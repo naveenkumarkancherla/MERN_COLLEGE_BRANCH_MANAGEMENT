@@ -1,0 +1,74 @@
+/* Main container styles */
+.container {
+  padding: 20px;
+}
+
+/* Custom card container */
+.custom-card {
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+/* Custom card body styles */
+.custom-card .card-body {
+  padding: 20px;
+}
+
+/* Center align text in the card */
+.text-center {
+  text-align: center;
+}
+
+/* Form group styles */
+.form-group {
+  margin: 10px 0;
+}
+
+/* Input field styles */
+.form-control {
+  background-color: #fff;
+}
+
+/* Custom input field styles */
+.custom-input {
+  background-color: purple;
+  color: white;
+  font-size: 18px;
+}
+
+/* Table styles */
+.custom-table {
+  width: 100%;
+}
+
+/* Grade 'R' background color */
+.grade-red {
+  background-color: red;
+}
+
+/* Note styles */
+.note {
+  font-size: 14px;
+}
+
+/* Custom CGPA input field styles */
+.custom-cgpa {
+  font-size: 19px;
+  font-weight: 900;
+}
+
+/* Back button styles */
+.btn-danger {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  text-decoration: none;
+}
+
+/* Button hover styles */
+.btn-danger:hover {
+  background-color: darkred;
+}
