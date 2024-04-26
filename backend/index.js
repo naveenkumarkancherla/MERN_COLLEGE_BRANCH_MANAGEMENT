@@ -10,7 +10,7 @@ app.use(express.json()); //to convert request data to json
 
 app.use(cors(
   {
-    origin : ["https://deploy-MERN-College-Management.vercel.app"],
+    origin : ["https://mern-college-branch-management-frontend.vercel.app"],
     method : ["POST","GET"],
     credentials : true
   }
