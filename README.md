@@ -3,11 +3,19 @@
 @Naveen kumar Naidu
 ------
 
-Demo Video:
+Demo Videos:
 
-
+ADMIN::
 https://github.com/user-attachments/assets/5dc94bb3-4bd9-4886-8375-006014fddaa1
 
+STUDENT::
+
+https://github.com/user-attachments/assets/3e9bb5e1-cf85-455b-9164-f68f3bfc8e54
+
+FACULTY::
+MONGODB & FIREBASE
+<img width="1785" height="954" alt="Screenshot 2025-06-24 231501" src="https://github.com/user-attachments/assets/a1e41dc6-14f1-4ccb-a606-79a885b475bb" />
+<img width="1915" height="1029" alt="Screenshot 2025-06-24 231530" src="https://github.com/user-attachments/assets/6765cfba-4d3b-46ae-82e0-a9b040e5dc49" />
 
 ------
 
