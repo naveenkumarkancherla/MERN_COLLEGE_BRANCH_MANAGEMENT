@@ -13,6 +13,11 @@ STUDENT::
 https://github.com/user-attachments/assets/3e9bb5e1-cf85-455b-9164-f68f3bfc8e54
 
 FACULTY::
+
+
+https://github.com/user-attachments/assets/4f5b51f3-d7e5-48ed-bbc4-0f93b358a696
+
+
 MONGODB & FIREBASE
 <img width="1785" height="954" alt="Screenshot 2025-06-24 231501" src="https://github.com/user-attachments/assets/a1e41dc6-14f1-4ccb-a606-79a885b475bb" />
 <img width="1915" height="1029" alt="Screenshot 2025-06-24 231530" src="https://github.com/user-attachments/assets/6765cfba-4d3b-46ae-82e0-a9b040e5dc49" />
