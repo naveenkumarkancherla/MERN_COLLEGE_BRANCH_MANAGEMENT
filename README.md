@@ -6,7 +6,11 @@
 Demo Videos:
 
 ADMIN::
-https://github.com/user-attachments/assets/5dc94bb3-4bd9-4886-8375-006014fddaa1
+
+
+https://github.com/user-attachments/assets/b2807fcd-1879-4989-987d-91be28ff86c5
+
+
 
 STUDENT::
 
