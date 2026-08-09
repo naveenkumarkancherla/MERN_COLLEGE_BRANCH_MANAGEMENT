@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react";
 import { FiUpload } from "react-icons/fi";
 import Heading from "../../components/Heading";
 import { AiOutlineClose } from "react-icons/ai";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import toast from "react-hot-toast";
-import { storage } from "../../firebase/config";
+import { uploadToCloudinary } from "../../upload";
 import { useSelector } from "react-redux";
 import { baseApiURL } from "../../baseUrl";
 const Material = () => {
@@ -41,28 +40,17 @@ const Material = () => {
   useEffect(() => {
     const uploadFileToStorage = async (file) => {
       toast.loading("Upload Material To Storage");
-      const storageRef = ref(
-        storage,
-        `Material/${selected.subject}/${selected.title} - ${selected.faculty}`
-      );
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {},
-        (error) => {
-          console.error(error);
-          toast.dismiss();
-          toast.error("Something Went Wrong!");
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            toast.dismiss();
-            setFile();
-            toast.success("Material Uploaded To Storage");
-            setSelected({ ...selected, link: downloadURL });
-          });
-        }
-      );
+      try {
+        const downloadURL = await uploadToCloudinary(file);
+        toast.dismiss();
+        setFile();
+        toast.success("Material Uploaded To Storage");
+        setSelected({ ...selected, link: downloadURL });
+      } catch (error) {
+        console.error(error);
+        toast.dismiss();
+        toast.error("Something Went Wrong!");
+      }
     };
     file && uploadFileToStorage(file);
   }, [file]);

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Heading from "../../components/Heading";
 import axios from "axios";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { storage } from "../../firebase/config";
+import { uploadToCloudinary } from "../../upload";
 import { baseApiURL } from "../../baseUrl";
 import { FiSearch, FiUpload } from "react-icons/fi";
 
@@ -25,28 +24,17 @@ const Admin = () => {
   useEffect(() => {
     const uploadFileToStorage = async (file) => {
       toast.loading("Upload Photo To Storage");
-      const storageRef = ref(
-        storage,
-        `Admin Profile/${data.department}/${data.employeeId}`
-      );
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {},
-        (error) => {
-          console.error(error);
-          toast.dismiss();
-          toast.error("Something Went Wrong!");
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            toast.dismiss();
-            setFile();
-            toast.success("Profile Uploaded To Admin");
-            setData({ ...data, profile: downloadURL });
-          });
-        }
-      );
+      try {
+        const downloadURL = await uploadToCloudinary(file);
+        toast.dismiss();
+        setFile();
+        toast.success("Profile Uploaded To Admin");
+        setData({ ...data, profile: downloadURL });
+      } catch (error) {
+        console.error(error);
+        toast.dismiss();
+        toast.error("Something Went Wrong!");
+      }
     };
     file && uploadFileToStorage(file);
   }, [data, file]);

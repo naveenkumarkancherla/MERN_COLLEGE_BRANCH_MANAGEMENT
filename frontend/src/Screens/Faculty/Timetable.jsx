@@ -3,9 +3,8 @@ import React, { useEffect, useState } from "react";
 import { FiUpload } from "react-icons/fi";
 import Heading from "../../components/Heading";
 import { AiOutlineClose } from "react-icons/ai";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import toast from "react-hot-toast";
-import { storage } from "../../firebase/config";
+import { uploadToCloudinary } from "../../upload";
 import { baseApiURL } from "../../baseUrl";
 const Timetable = () => {
   const [addselected, setAddSelected] = useState({
@@ -23,29 +22,18 @@ const Timetable = () => {
   useEffect(() => {
     const uploadFileToStorage = async (file) => {
       toast.loading("Upload Timetable To Server");
-      const storageRef = ref(
-        storage,
-        `Timetable/${addselected.branch}/Semester ${addselected.semester}`
-      );
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {},
-        (error) => {
-          console.error(error);
-          toast.dismiss();
-          // toast.error("Something Went Wrong!");
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            toast.dismiss();
-            setFile();
-            toast.success("Timetable Uploaded To Server");
-            setAddSelected({ ...addselected, link: downloadURL });
-            addTimetableHandler();
-          });
-        }
-      );
+      try {
+        const downloadURL = await uploadToCloudinary(file);
+        toast.dismiss();
+        setFile();
+        toast.success("Timetable Uploaded To Server");
+        setAddSelected({ ...addselected, link: downloadURL });
+        addTimetableHandler();
+      } catch (error) {
+        console.error(error);
+        toast.dismiss();
+        // toast.error("Something Went Wrong!");
+      }
     };
     file && uploadFileToStorage(file);
   }, [file]);

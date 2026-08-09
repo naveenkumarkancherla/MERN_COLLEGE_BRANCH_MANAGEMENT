@@ -5,9 +5,13 @@ connectToMongo();
 const port = process.env.PORT || 5000;
 var cors = require("cors");
 
+// ponytail: allow all origins until FRONTEND_URL is set; then lock to it (+localhost).
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(",").map((s) => s.trim()).concat("http://localhost:3000")
+  : true;
 app.use(cors({
-  origin: ["https://mern-college-branch-management-frontend.vercel.app"],
-  methods: ["POST", "GET"],
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
@@ -34,6 +38,11 @@ app.use("/api/subject", require("./routes/subject"));
 app.use("/api/marks", require("./routes/marks"));
 app.use("/api/branch", require("./routes/branch"));
 
-app.listen(port, () => {
-  console.log(`Server Listening On http://localhost:${port}`);
-});
+// Local dev listens; on Vercel the app is imported as a serverless handler.
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Server Listening On http://localhost:${port}`);
+  });
+}
+
+module.exports = app;
