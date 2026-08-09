@@ -7,7 +7,7 @@ import { baseApiURL } from "../../baseUrl";
 import { FiSearch, FiUpload } from "react-icons/fi";
 const Student = () => {
   const [file, setFile] = useState();
-  const [selected, setSelected] = useState("add");
+  const [selected, setSelected] = useState("view");
   const [branch, setBranch] = useState();
   const [search, setSearch] = useState();
   const [data, setData] = useState({
@@ -23,6 +23,24 @@ const Student = () => {
     profile: "",
   });
   const [id, setId] = useState();
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const getAllStudents = () => {
+    setLoading(true);
+    axios
+      .post(
+        `${baseApiURL()}/student/details/getDetails`,
+        {},
+        { headers: { "Content-Type": "application/json" } }
+      )
+      .then((response) => {
+        if (response.data.success) setStudents(response.data.user);
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
+  };
+
   const getBranchData = () => {
     const headers = {
       "Content-Type": "application/json",
@@ -61,10 +79,15 @@ const Student = () => {
 
   useEffect(() => {
     getBranchData();
+    getAllStudents();
   }, []);
 
   const addStudentProfile = (e) => {
     e.preventDefault();
+    if (!data.profile) {
+      toast.error("Please upload a profile photo");
+      return;
+    }
     toast.loading("Adding Student");
     const headers = {
       "Content-Type": "application/json",
@@ -203,6 +226,7 @@ const Student = () => {
 
   const setMenuHandler = (type) => {
     setSelected(type);
+    if (type === "view") getAllStudents();
     setFile("");
     setSearch("");
     setId("");
@@ -227,6 +251,14 @@ const Student = () => {
         <div className="flex justify-end items-center w-full">
           <button
             className={`${
+              selected === "view" && "border-b-2 "
+            }border-blue-500 px-4 py-2 text-black rounded-sm mr-6`}
+            onClick={() => setMenuHandler("view")}
+          >
+            View Students
+          </button>
+          <button
+            className={`${
               selected === "add" && "border-b-2 "
             }border-blue-500 px-4 py-2 text-black rounded-sm mr-6`}
             onClick={() => setMenuHandler("add")}
@@ -243,6 +275,46 @@ const Student = () => {
           </button>
         </div>
       </div>
+      {selected === "view" && loading && (
+        <div className="w-full flex justify-center items-center mt-16">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      {selected === "view" && !loading && (
+        <div className="w-full mt-8">
+          <p className="text-lg font-medium mb-4">
+            Total Students: {students.length}
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-blue-500 text-white">
+                  <th className="py-2 px-3">Enrollment No</th>
+                  <th className="py-2 px-3">Name</th>
+                  <th className="py-2 px-3">Branch</th>
+                  <th className="py-2 px-3">Sem</th>
+                  <th className="py-2 px-3">Email</th>
+                  <th className="py-2 px-3">Phone</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((s) => (
+                  <tr key={s._id} className="border-b hover:bg-blue-50">
+                    <td className="py-2 px-3">{s.enrollmentNo}</td>
+                    <td className="py-2 px-3">
+                      {s.firstName} {s.middleName} {s.lastName}
+                    </td>
+                    <td className="py-2 px-3">{s.branch}</td>
+                    <td className="py-2 px-3">{s.semester}</td>
+                    <td className="py-2 px-3">{s.email}</td>
+                    <td className="py-2 px-3">{s.phoneNumber}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
       {selected === "add" && (
         <form
           onSubmit={addStudentProfile}
@@ -257,6 +329,7 @@ const Student = () => {
               id="firstname"
               value={data.firstName}
               onChange={(e) => setData({ ...data, firstName: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -269,6 +342,7 @@ const Student = () => {
               id="middlename"
               value={data.middleName}
               onChange={(e) => setData({ ...data, middleName: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -281,6 +355,7 @@ const Student = () => {
               id="lastname"
               value={data.lastName}
               onChange={(e) => setData({ ...data, lastName: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -295,6 +370,7 @@ const Student = () => {
               onChange={(e) =>
                 setData({ ...data, enrollmentNo: e.target.value })
               }
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -307,6 +383,7 @@ const Student = () => {
               id="email"
               value={data.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -321,6 +398,7 @@ const Student = () => {
               onChange={(e) =>
                 setData({ ...data, phoneNumber: e.target.value })
               }
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -330,11 +408,12 @@ const Student = () => {
             </label>
             <select
               id="semester"
+              required
               className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
               value={data.semester}
               onChange={(e) => setData({ ...data, semester: e.target.value })}
             >
-              <option defaultValue>-- Select --</option>
+              <option value="">-- Select --</option>
               <option value="1">1st Semester</option>
               <option value="2">2nd Semester</option>
               <option value="3">3rd Semester</option>
@@ -351,11 +430,12 @@ const Student = () => {
             </label>
             <select
               id="branch"
+              required
               className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
               value={data.branch}
               onChange={(e) => setData({ ...data, branch: e.target.value })}
             >
-              <option defaultValue>-- Select --</option>
+              <option value="">-- Select --</option>
               {branch?.map((branch) => {
                 return (
                   <option value={branch.name} key={branch.name}>
@@ -371,11 +451,12 @@ const Student = () => {
             </label>
             <select
               id="gender"
+              required
               className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
               value={data.gender}
               onChange={(e) => setData({ ...data, gender: e.target.value })}
             >
-              <option defaultValue>-- Select --</option>
+              <option value="">-- Select --</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
@@ -441,7 +522,8 @@ const Student = () => {
                   onChange={(e) =>
                     setData({ ...data, firstName: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -455,7 +537,8 @@ const Student = () => {
                   onChange={(e) =>
                     setData({ ...data, middleName: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -469,7 +552,8 @@ const Student = () => {
                   onChange={(e) =>
                     setData({ ...data, lastName: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -484,7 +568,8 @@ const Student = () => {
                   onChange={(e) =>
                     setData({ ...data, enrollmentNo: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -496,7 +581,8 @@ const Student = () => {
                   id="email"
                   value={data.email}
                   onChange={(e) => setData({ ...data, email: e.target.value })}
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -510,7 +596,8 @@ const Student = () => {
                   onChange={(e) =>
                     setData({ ...data, phoneNumber: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -520,13 +607,14 @@ const Student = () => {
                 <select
                   disabled
                   id="semester"
-                  className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
+                  required
+              className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
                   value={data.semester}
                   onChange={(e) =>
                     setData({ ...data, semester: e.target.value })
                   }
                 >
-                  <option defaultValue>-- Select --</option>
+                  <option value="">-- Select --</option>
                   <option value="1">1st Semester</option>
                   <option value="2">2nd Semester</option>
                   <option value="3">3rd Semester</option>
@@ -544,11 +632,12 @@ const Student = () => {
                 <select
                   disabled
                   id="branch"
-                  className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
+                  required
+              className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
                   value={data.branch}
                   onChange={(e) => setData({ ...data, branch: e.target.value })}
                 >
-                  <option defaultValue>-- Select --</option>
+                  <option value="">-- Select --</option>
                   {branch?.map((branch) => {
                     return (
                       <option value={branch.name} key={branch.name}>
@@ -564,7 +653,8 @@ const Student = () => {
                 </label>
                 <select
                   id="gender"
-                  className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
+                  required
+              className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
                   value={data.gender}
                   onChange={(e) => setData({ ...data, gender: e.target.value })}
                 >

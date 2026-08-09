@@ -8,7 +8,7 @@ import { FiSearch, FiUpload } from "react-icons/fi";
 
 const Faculty = () => {
   const [file, setFile] = useState();
-  const [selected, setSelected] = useState("add");
+  const [selected, setSelected] = useState("view");
   const [branch, setBranch] = useState();
   const [data, setData] = useState({
     employeeId: "",
@@ -25,6 +25,24 @@ const Faculty = () => {
   });
   const [id, setId] = useState();
   const [search, setSearch] = useState();
+  const [faculties, setFaculties] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const getAllFaculties = () => {
+    setLoading(true);
+    axios
+      .post(
+        `${baseApiURL()}/faculty/details/getDetails`,
+        {},
+        { headers: { "Content-Type": "application/json" } }
+      )
+      .then((response) => {
+        if (response.data.success) setFaculties(response.data.user);
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
+  };
+
   const getBranchData = () => {
     const headers = {
       "Content-Type": "application/json",
@@ -63,10 +81,15 @@ const Faculty = () => {
 
   useEffect(() => {
     getBranchData();
+    getAllFaculties();
   }, []);
 
   const addFacultyProfile = (e) => {
     e.preventDefault();
+    if (!data.profile) {
+      toast.error("Please upload a profile photo");
+      return;
+    }
     toast.loading("Adding Faculty");
     const headers = {
       "Content-Type": "application/json",
@@ -204,6 +227,7 @@ const Faculty = () => {
   };
   const setMenuHandler = (type) => {
     setSelected(type);
+    if (type === "view") getAllFaculties();
     setFile("");
     setSearch("");
     setId("");
@@ -228,6 +252,14 @@ const Faculty = () => {
         <div className="flex justify-end items-center w-full">
           <button
             className={`${
+              selected === "view" && "border-b-2 "
+            }border-blue-500 px-4 py-2 text-black rounded-sm mr-6`}
+            onClick={() => setMenuHandler("view")}
+          >
+            View Faculties
+          </button>
+          <button
+            className={`${
               selected === "add" && "border-b-2 "
             }border-blue-500 px-4 py-2 text-black rounded-sm mr-6`}
             onClick={() => setMenuHandler("add")}
@@ -244,6 +276,48 @@ const Faculty = () => {
           </button>
         </div>
       </div>
+      {selected === "view" && loading && (
+        <div className="w-full flex justify-center items-center mt-16">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      {selected === "view" && !loading && (
+        <div className="w-full mt-8">
+          <p className="text-lg font-medium mb-4">
+            Total Faculties: {faculties.length}
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-blue-500 text-white">
+                  <th className="py-2 px-3">Employee ID</th>
+                  <th className="py-2 px-3">Name</th>
+                  <th className="py-2 px-3">Department</th>
+                  <th className="py-2 px-3">Post</th>
+                  <th className="py-2 px-3">Exp</th>
+                  <th className="py-2 px-3">Email</th>
+                  <th className="py-2 px-3">Phone</th>
+                </tr>
+              </thead>
+              <tbody>
+                {faculties.map((f) => (
+                  <tr key={f._id} className="border-b hover:bg-blue-50">
+                    <td className="py-2 px-3">{f.employeeId}</td>
+                    <td className="py-2 px-3">
+                      {f.firstName} {f.middleName} {f.lastName}
+                    </td>
+                    <td className="py-2 px-3">{f.department}</td>
+                    <td className="py-2 px-3">{f.post}</td>
+                    <td className="py-2 px-3">{f.experience}</td>
+                    <td className="py-2 px-3">{f.email}</td>
+                    <td className="py-2 px-3">{f.phoneNumber}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
       {selected === "add" && (
         <form
           onSubmit={addFacultyProfile}
@@ -258,6 +332,7 @@ const Faculty = () => {
               id="firstname"
               value={data.firstName}
               onChange={(e) => setData({ ...data, firstName: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -270,6 +345,7 @@ const Faculty = () => {
               id="middlename"
               value={data.middleName}
               onChange={(e) => setData({ ...data, middleName: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -282,6 +358,7 @@ const Faculty = () => {
               id="lastname"
               value={data.lastName}
               onChange={(e) => setData({ ...data, lastName: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -294,6 +371,7 @@ const Faculty = () => {
               id="employeeId"
               value={data.employeeId}
               onChange={(e) => setData({ ...data, employeeId: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -306,6 +384,7 @@ const Faculty = () => {
               id="email"
               value={data.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -320,6 +399,7 @@ const Faculty = () => {
               onChange={(e) =>
                 setData({ ...data, phoneNumber: e.target.value })
               }
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -329,11 +409,12 @@ const Faculty = () => {
             </label>
             <select
               id="branch"
+              required
               className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
               value={data.department}
               onChange={(e) => setData({ ...data, department: e.target.value })}
             >
-              <option defaultValue>-- Select --</option>
+              <option value="">-- Select --</option>
               {branch?.map((branch) => {
                 return (
                   <option value={branch.name} key={branch.name}>
@@ -352,6 +433,7 @@ const Faculty = () => {
               id="post"
               value={data.post}
               onChange={(e) => setData({ ...data, post: e.target.value })}
+              required
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
@@ -362,11 +444,12 @@ const Faculty = () => {
               </label>
               <select
                 id="gender"
-                className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
+                required
+              className="px-2 bg-blue-50 py-3 rounded-sm text-base w-full accent-blue-700 mt-1"
                 value={data.gender}
                 onChange={(e) => setData({ ...data, gender: e.target.value })}
               >
-                <option defaultValue>-- Select --</option>
+                <option value="">-- Select --</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
@@ -382,7 +465,8 @@ const Faculty = () => {
                 onChange={(e) =>
                   setData({ ...data, experience: e.target.value })
                 }
-                className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
               />
             </div>
             <div className="w-[25%]">
@@ -447,7 +531,8 @@ const Faculty = () => {
                   onChange={(e) =>
                     setData({ ...data, firstName: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -461,7 +546,8 @@ const Faculty = () => {
                   onChange={(e) =>
                     setData({ ...data, middleName: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -475,7 +561,8 @@ const Faculty = () => {
                   onChange={(e) =>
                     setData({ ...data, lastName: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -490,7 +577,8 @@ const Faculty = () => {
                   onChange={(e) =>
                     setData({ ...data, employeeId: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -502,7 +590,8 @@ const Faculty = () => {
                   id="email"
                   value={data.email}
                   onChange={(e) => setData({ ...data, email: e.target.value })}
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -516,7 +605,8 @@ const Faculty = () => {
                   onChange={(e) =>
                     setData({ ...data, phoneNumber: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -528,7 +618,8 @@ const Faculty = () => {
                   id="email"
                   value={data.email}
                   onChange={(e) => setData({ ...data, email: e.target.value })}
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -540,7 +631,8 @@ const Faculty = () => {
                   id="post"
                   value={data.post}
                   onChange={(e) => setData({ ...data, post: e.target.value })}
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
@@ -554,7 +646,8 @@ const Faculty = () => {
                   onChange={(e) =>
                     setData({ ...data, experience: e.target.value })
                   }
-                  className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  required
+              className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                 />
               </div>
               <div className="w-[40%]">
