@@ -3,6 +3,24 @@
 @Naveen kumar Naidu
 ------
 
+## 🚀 Live Demo
+
+**App:** https://mern-college-branch-management-fron.vercel.app
+
+> ⏳ The backend runs on a free serverless tier, so the **first request after it's been idle may take ~10–30s or fail once** — just retry the login and it'll work.
+
+### 🔑 Test Credentials (password is `112233` for everyone)
+
+| Role | Login ID | Password |
+|------|----------|----------|
+| **Admin** | `123123` | `112233` |
+| **Faculty** | `1001` – `1010` (any of the 10) | `112233` |
+| **Student** | `230001` – `230050` (any of the 50) | `112233` |
+
+Seeded test data: **5 branches** (Computer Science, Electronics, Mechanical, Civil, Information Technology), **10 faculty**, **50 students** spread across the branches and semesters 1–8.
+
+------
+
 Demo Videos:
 
 ADMIN::
